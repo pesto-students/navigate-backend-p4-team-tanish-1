@@ -1,7 +1,13 @@
 const mongoose = require("mongoose");
 
 const alumniSchema = new mongoose.Schema({
+    firebaseID: {
+        unique: true,
+        required: true,
+        type: String
+    },
     email: {
+        unique: true,
         required: true,
         type: String
     },

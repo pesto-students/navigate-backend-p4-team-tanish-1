@@ -8,11 +8,15 @@ async function Create(req, res) {
             data: savedObj,
             message: "Data saved to database",
         });
-    } catch(exception) {
-        console.log(exception);
+    } 
+    catch(exception) {
+        let message = "Something went wrong"
+        if(exception.code === 1100){
+            message = "Email Already registered"
+        }
         res.status(500).json({
-            data: exception,
-            message: "Something went wrong",
+            data: null,
+            message: message
         });
     }
 }
@@ -68,4 +72,21 @@ async function ReadByID(req, res) {
     }
 }
 
-module.exports = { Create, Update, Read, ReadByID };
+async function ReadByEmail(req, res) {
+    try{
+        const studentEmail = res.locals.email
+        const data = await Student.findOne({email: studentEmail})
+        res.status(200).json({
+            data: data,
+            message: "Student fetched successfully",
+        });
+    } catch (exception) {
+        console.log(exception);
+        res.status(500).json({
+            data: exception,
+            message: "Something went wrong",
+        });
+    }
+}
+
+module.exports = { Create, Update, Read, ReadByID, ReadByEmail };
