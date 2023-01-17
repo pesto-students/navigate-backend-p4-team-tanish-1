@@ -6,8 +6,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const middleWare = require("./src/middleware");
+
 const studentRouter = require('./src/routes/student');
 const alumniRouter = require('./src/routes/alumni');
+const sessionRouter = require('./src/routes/session');
+const meetingRouter = require('./src/routes/meeting');
 
 const port = 4000;
 const uri = process.env.MONGODB_URI;
@@ -20,6 +23,8 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: false }))
 
 app.use('/student', studentRouter);
 app.use('/alumni', alumniRouter);
+app.use('/booking', sessionRouter);
+app.use('/meeting', meetingRouter);
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`)
