@@ -18,22 +18,17 @@ async function Create(req, res) {
 }
 
 async function Update(req, res) {
-    console.log(req.body);
+    const availability = {
+        weekdaysFrom: req.body.weekdaysFrom,
+        weekdaysTo: req.body.weekdaysTo,
+        weekendFrom: req.body.weekendFrom,
+        weekendTo: req.body.weekendTo
+    }
+    const values = req.body;
+    values.availability = availability;
     try {
         let alumni_id = req.params.id;
-        const interests = req.body.interests.split(", ")
-        console.log(interests);
-        const data = await Alumni.findByIdAndUpdate(alumni_id, {
-            name: req.body.name,
-            headline: req.body.headline,
-            bio: req.body.bio,
-            workOrg: req.body.workOrg,
-            workRole: req.body.workRole,
-            workSummary: req.body.workSummary,
-            interests: interests,
-            eduInstitute: req.body.eduInstitute,
-            eduDegree: req.body.eduDegree
-        });
+        const data = await Alumni.findByIdAndUpdate(alumni_id, values);
         res.status(200).json({
             data: data,
             message: "Record updated successfully",
@@ -80,4 +75,39 @@ async function ReadByID(req, res) {
     }
 }
 
-module.exports = { Create, Update, Read, ReadByID };
+async function ReadByEmail(req, res) {
+    try{
+        const studentEmail = res.locals.email
+        const data = await Alumni.findOne({email: studentEmail})
+        res.status(200).json({
+            data: data,
+            message: "Alumni fetched successfully",
+        });
+    } catch (exception) {
+        console.log(exception);
+        res.status(500).json({
+            data: exception,
+            message: "Something went wrong",
+        });
+    }
+}
+
+async function FilterByInterest(req, res){
+    const interest = req.body.interest;
+    try{
+        const alumniData = await Alumni.find({interest: interest})
+        res.status(200).json({
+            data: alumniData,
+            message: "Suggested Alumni fetched successfully",
+        });
+    }
+    catch (exception) {
+        console.log(exception);
+        res.status(500).json({
+            data: exception,
+            message: "Something went wrong",
+        });
+    }
+}
+
+module.exports = { Create, Update, Read, ReadByID, ReadByEmail, FilterByInterest };

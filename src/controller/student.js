@@ -1,6 +1,7 @@
 const Student = require("../models/student");
 
 async function Create(req, res) {
+    console.log(req.body);
     try {
         const studentObj = new Student(req.body);
         const savedObj = await studentObj.save();
@@ -22,7 +23,6 @@ async function Create(req, res) {
 }
 
 async function Update(req, res) {
-    console.log(req.body);
     try {
         let student_id = req.params.id;
         const data = await Student.findByIdAndUpdate(student_id, req.body);
@@ -64,7 +64,7 @@ async function ReadByID(req, res) {
             message: "Student fetched successfully",
         });
     } catch (exception) {
-        console.log(exception);
+        console.log("Exception", exception);
         res.status(500).json({
             data: exception,
             message: "Something went wrong",

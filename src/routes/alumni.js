@@ -14,6 +14,10 @@ router.get('/get/:id', alumniController.ReadByID)
 
 router.post('/update/:id', alumniController.Update)
 
+router.post('/find/', alumniController.ReadByEmail);
+
+router.post('/suggested/', alumniController.FilterByInterest);
+
 router.search('/search', (req, res) => {
     res.send("search and filter alumni here")
 })

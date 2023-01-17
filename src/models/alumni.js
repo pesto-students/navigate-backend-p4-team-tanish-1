@@ -23,11 +23,11 @@ const alumniSchema = new mongoose.Schema({
         required: false,
         type: String
     },
-    workOrg: {
+    organization: {
         required: false,
         type: String
     },
-    workRole: {
+    role: {
         required: false,
         type: String
     },
@@ -35,17 +35,37 @@ const alumniSchema = new mongoose.Schema({
         required: false,
         type: String
     },
-    interests: {
+    interest: {
         required: false,
         type: Array
     },
-    eduInstitute: {
+    institution: {
         required: false,
         type: String
     },
-    eduDegree: {
+    course: {
         required: false,
         type: String
+    },
+    weekdaysFrom: {
+        required: false,
+        type: String
+    },
+    weekdaysTo: {
+        required: false,
+        type: String
+    },
+    weekendsFrom: {
+        required: false,
+        type: String
+    },
+    weekendsTo: {
+        required: false,
+        type: String
+    },
+    pricing: {
+        required: false,
+        type: Number
     }
 })
 

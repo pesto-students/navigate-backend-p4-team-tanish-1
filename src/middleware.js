@@ -13,6 +13,7 @@ async function verifyToken(req, res, next) {
         next();
     }
     catch (err) {
+        console.log(err);
         res.status(401);
         return next('Unauthorized');
     }

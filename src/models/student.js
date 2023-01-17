@@ -23,11 +23,11 @@ const studentSchema = new mongoose.Schema({
         required: false,
         type: String
     },
-    workOrg: {
+    organization: {
         required: false,
         type: String
     },
-    workRole: {
+    role: {
         required: false,
         type: String
     },
@@ -35,15 +35,15 @@ const studentSchema = new mongoose.Schema({
         required: false,
         type: String
     },
-    interests: {
+    interest: {
         required: false,
         type: Array
     },
-    eduInstitute: {
+    institution: {
         required: false,
         type: String
     },
-    eduDegree: {
+    course: {
         required: false,
         type: String
     }
