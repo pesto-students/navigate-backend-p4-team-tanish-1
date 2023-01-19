@@ -45,6 +45,7 @@ async function Update(req, res) {
 async function Read(req, res) {
     try {
         const data = await Alumni.find();
+        console.log(data)
         res.status(200).json({
             data: data,
             message: "Alumnis fetched successfully",

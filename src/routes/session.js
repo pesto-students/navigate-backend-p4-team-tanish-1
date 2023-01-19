@@ -7,6 +7,8 @@ router.get('/', (req, res) => {
 })
 
 router.post('/create/', sessionController.Create);
-router.post('/upcoming/', sessionController.getRecent);
+router.post('/upcoming/student/', sessionController.getUpcomingForStudent);
+router.post('/upcoming/alumni/', sessionController.getUpcomingForAlumni);
+router.post('/slots', sessionController.getAvailableSlots);
 
 module.exports = router

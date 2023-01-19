@@ -1,4 +1,5 @@
 const axios = require("axios");
+const Session = require("../models/session")
 
 const DYTE_HOST = "https://api.cluster.dyte.in/v2"
 const USERNAME = process.env.DYTE_ORGANIZATION_ID
@@ -30,10 +31,10 @@ async function dyteCreateMeeting(topic){
 }
 
 async function addParticipant(req, res){
+    const id = req.body.id
+    const data = await Session.find({_id: {$eq: id}});
+    console.log(data);
 
-    // ADD TIME, USER AND PAYMENT VERIFICATION HERE
-
-    const meetingID = req.body.meetingID
     const URL = `/meetings/${meetingID}/participants`
     const body = {
         "name": "Mary Sue",
@@ -51,7 +52,6 @@ async function addParticipant(req, res){
         data: response.data,
         message: "Participant added"
     })
-    return response;
 }
 
 module.exports = { dyteCreateMeeting, addParticipant }

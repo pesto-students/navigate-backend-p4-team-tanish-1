@@ -1,14 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema
 
-const sessionSchema = new mongoose.Schema({
-    studentID: {
-        required: true,
-        type: String
-    },
-    alumniID: {
-        required: true,
-        type: String
-    },
+const sessionSchema = new Schema({
     topic: {
         required: true,
         type: String
@@ -48,6 +41,14 @@ const sessionSchema = new mongoose.Schema({
     meetingID: {
         required: true,
         type: String
+    },
+    student: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Student' 
+    },
+    alumni: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Alumni' 
     }
 })
 

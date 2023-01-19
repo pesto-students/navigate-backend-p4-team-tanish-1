@@ -69,6 +69,4 @@ const alumniSchema = new mongoose.Schema({
     }
 })
 
-const SuccessResponse = {}
-
 module.exports = mongoose.model('Alumni', alumniSchema)
