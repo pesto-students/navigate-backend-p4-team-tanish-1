@@ -30,14 +30,6 @@ const sessionSchema = new Schema({
         required: false,
         type: Boolean
     },
-    paymentID: {
-        required: false,
-        type: String
-    },
-    meetingLink:{
-        required: false,
-        type: String
-    },
     meetingID: {
         required: true,
         type: String
@@ -49,7 +41,25 @@ const sessionSchema = new Schema({
     alumni: { 
         type: Schema.Types.ObjectId, 
         ref: 'Alumni' 
+    },
+    orderID: {
+        required: false,
+        type: String
+    },
+    paymentID: {
+        required: false,
+        type: String
+    },
+    paymentSignature: {
+        required: false,
+        type: String
+    },
+    participants: {
+        required: false,
+        type: Array
     }
+},{
+    timestamps: true
 })
 
 module.exports = mongoose.model('Sessions', sessionSchema)

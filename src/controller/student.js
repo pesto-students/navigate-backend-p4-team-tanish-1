@@ -16,7 +16,7 @@ async function Create(req, res) {
             message = "Email Already registered"
         }
         res.status(500).json({
-            data: null,
+            error: exception,
             message: message
         });
     }
@@ -33,7 +33,7 @@ async function Update(req, res) {
     } catch (exception) {
         console.log(exception);
         res.status(500).json({
-            data: exception,
+            error: exception,
             message: "Something went wrong",
         });
     }
@@ -49,7 +49,7 @@ async function Read(req, res) {
     } catch (exception) {
         console.log(exception);
         res.status(500).json({
-            data: exception,
+            error: exception,
             message: "Something went wrong",
         });
     }
@@ -66,7 +66,7 @@ async function ReadByID(req, res) {
     } catch (exception) {
         console.log("Exception", exception);
         res.status(500).json({
-            data: exception,
+            error: exception,
             message: "Something went wrong",
         });
     }
@@ -83,7 +83,7 @@ async function ReadByEmail(req, res) {
     } catch (exception) {
         console.log(exception);
         res.status(500).json({
-            data: exception,
+            error: exception,
             message: "Something went wrong",
         });
     }

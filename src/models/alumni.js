@@ -67,6 +67,8 @@ const alumniSchema = new mongoose.Schema({
         required: false,
         type: Number
     }
+},{
+    timestamps: true
 })
 
 module.exports = mongoose.model('Alumni', alumniSchema)

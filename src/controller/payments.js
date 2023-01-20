@@ -1,5 +1,6 @@
 const Razorpay = require("razorpay")
-const crypto = require("crypto")
+const crypto = require("crypto");
+const session = require("../models/session");
 
 const instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY,
@@ -11,7 +12,7 @@ async function createOrder(amount){
     console.log(amount);
     try{
         const order = await instance.orders.create({
-            amount: 50000,
+            amount: amount*100,
             currency: "INR"
         })
         console.log(order);
@@ -23,15 +24,15 @@ async function createOrder(amount){
 }
 
 async function verifyPayment(req, res) {
-    const {order_id, payment_id, razorpay_signature} = req.body;
+    const {order_id, payment_id, razorpay_signature, sessionID} = req.body;
     try{
-        const body = order_id + "|" + payment_id;
-        const expectedSignature = crypto
-            .createHmac("sha256", process.env.RAZORPAY_SECRET)
-            .update(body.toString())
-            .digest("hex");
-        
+        const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET);
+        hmac.update(order_id + "|" + payment_id);
+        let expectedSignature = hmac.digest('hex');
         const isVerified = razorpay_signature === expectedSignature;
+        if(isVerified){
+            await session.findOneAndUpdate({_id: sessionID}, {paymentID: payment_id, paymentSignature: razorpay_signature, paid: true});
+        }
         res.status(200).json({
             isVerified,
             message: "Signature verified"
@@ -40,7 +41,7 @@ async function verifyPayment(req, res) {
     catch(exception) {
         let message = "Something went wrong"
         res.status(500).json({
-            data: null,
+            error: exception,
             message: message
         });
     }
