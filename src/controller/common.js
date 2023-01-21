@@ -59,4 +59,4 @@ function getImage(key){
     }
 }
 
-module.exports = { uploadFile }
+module.exports = { uploadFile, getImage }

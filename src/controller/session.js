@@ -3,6 +3,7 @@ const Alumni = require("../models/alumni");
 const dyteController = require("./meeting");
 const paymentController = require("./payments");
 const session = require("../models/session");
+const { getImage } = require("./common");
 
 async function Create(req, res) {
     try {
@@ -48,6 +49,7 @@ async function getUpcomingForStudent(req, res){
         const studentID = req.body.studentID
         const sessionData = await Session.find({student: {$eq: studentID}}).sort({date: 1, from: 1}).populate('alumni');
         const upcomingSession = sessionData[0]
+        upcomingSession.alumni.image = upcomingSession.alumni.image ? getImage(upcomingSession.alumni.image) : null
         res.status(200).json({
             data: upcomingSession,
             message: "Upcoming session",
@@ -68,6 +70,7 @@ async function getUpcomingForAlumni(req, res){
         const alumniID = req.body.alumniID
         const sessionData = await Session.find({alumni: {$eq: alumniID}}).sort({date: 1, from: 1}).populate('student');
         const upcomingSession = sessionData[0]
+        upcomingSession.student.image = upcomingSession.student.image ? getImage(upcomingSession.student.image) : null
         res.status(200).json({
             data: upcomingSession,
             message: "Upcoming session",
