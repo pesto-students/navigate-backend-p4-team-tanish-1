@@ -59,6 +59,7 @@ async function ReadByID(req, res) {
     try {
         const student_id = req.params.id
         const data = await Student.findById(student_id);
+        data.image = data.image ? getImage(data.image) : null
         res.status(200).json({
             data: data,
             message: "Student fetched successfully",
@@ -76,6 +77,7 @@ async function ReadByEmail(req, res) {
     try{
         const studentEmail = res.locals.email
         const data = await Student.findOne({email: studentEmail})
+        data.image = data.image ? getImage(data.image) : null
         res.status(200).json({
             data: data,
             message: "Student fetched successfully",

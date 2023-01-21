@@ -1,5 +1,6 @@
 const Alumni = require("../models/alumni");
 const Session = require("../models/session");
+const { getImage } = require("./common");
 
 async function Create(req, res) {
     try {
@@ -44,9 +45,13 @@ async function Update(req, res) {
 }
 
 async function Read(req, res) {
-    const queryString = req.body.query
+    const queryString = req.query.q
+    const regExp = new RegExp(queryString, 'i')
     try {
-        const data = await Alumni.find({name: {$regex: '*' + queryString, $options: 'i'}});
+        const data = await Alumni.find({name: {$regex: regExp}});
+        for(let record of data){
+            record.image = record.image ? getImage(record.image) : null
+        }
         res.status(200).json({
             data: data,
             message: "Alumnis fetched successfully",
@@ -64,6 +69,7 @@ async function ReadByID(req, res) {
     try {
         const alumni_id = req.params.id
         const data = await Alumni.findById(alumni_id);
+        data.image = data.image ? getImage(data.image) : null
         res.status(200).json({
             data: data,
             message: "Alumni fetched successfully",
@@ -81,6 +87,7 @@ async function ReadByEmail(req, res) {
     try{
         const studentEmail = res.locals.email
         const data = await Alumni.findOne({email: studentEmail})
+        data.image = data.image ? getImage(data.image) : null
         res.status(200).json({
             data: data,
             message: "Alumni fetched successfully",
@@ -97,9 +104,12 @@ async function ReadByEmail(req, res) {
 async function FilterByInterest(req, res){
     const interest = req.body.interest;
     try{
-        const alumniData = await Alumni.find({interest: interest})
+        const data = await Alumni.find({interest: interest})
+        for(let record of data){
+            record.image = record.image ? getImage(record.image) : null
+        }
         res.status(200).json({
-            data: alumniData,
+            data: data,
             message: "Suggested Alumni fetched successfully",
         });
     }
@@ -114,9 +124,11 @@ async function FilterByInterest(req, res){
 
 async function getTodaySession(req, res){
     try{
-        const alumniID = req.body.alumniID
-        const today = new Date().toISOString().slice(0, 10)
+        const today = new Date("2023-01-24").toISOString().slice(0, 10)
         const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        for(let record of alumniData){
+            record.student.image = record.student.image ? getImage(record.student.image) : null
+        }
         res.status(200).json({
             data: alumniData,
             message: "Todays session",
@@ -134,8 +146,11 @@ async function getTodaySession(req, res){
 async function getPastSession(req, res){
     try{
         const alumniID = req.body.alumniID
-        const today = new Date().toISOString().slice(0, 10)
+        const today = new Date("2023-01-24").toISOString().slice(0, 10)
         const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        for(let record of alumniData){
+            record.student.image = record.student.image ? getImage(record.student.image) : null
+        }
         res.status(200).json({
             data: alumniData,
             message: "Todays session",
