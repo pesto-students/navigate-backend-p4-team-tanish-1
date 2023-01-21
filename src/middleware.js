@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("./navigate-firebase-private.json");
+const FIREBASE_PATH = process.env.FIREBASE_PRIVATE_PATH
+const serviceAccount = require(FIREBASE_PATH);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
