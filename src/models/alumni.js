@@ -6,6 +6,10 @@ const alumniSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    image: {
+        required: false,
+        type: String
+    },
     email: {
         unique: true,
         required: true,

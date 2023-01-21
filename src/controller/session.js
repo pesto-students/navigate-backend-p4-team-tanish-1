@@ -66,9 +66,7 @@ async function getUpcomingForStudent(req, res){
 async function getUpcomingForAlumni(req, res){
     try{
         const alumniID = req.body.alumniID
-        console.log(alumniID);
         const sessionData = await Session.find({alumni: {$eq: alumniID}}).sort({date: 1, from: 1}).populate('student');
-        console.log(sessionData);
         const upcomingSession = sessionData[0]
         res.status(200).json({
             data: upcomingSession,

@@ -1,4 +1,5 @@
 const Alumni = require("../models/alumni");
+const Session = require("../models/session");
 
 async function Create(req, res) {
     try {
@@ -43,9 +44,9 @@ async function Update(req, res) {
 }
 
 async function Read(req, res) {
+    const queryString = req.body.query
     try {
-        const data = await Alumni.find();
-        console.log(data)
+        const data = await Alumni.find({name: {$regex: '*' + queryString, $options: 'i'}});
         res.status(200).json({
             data: data,
             message: "Alumnis fetched successfully",
@@ -111,4 +112,42 @@ async function FilterByInterest(req, res){
     }
 }
 
-module.exports = { Create, Update, Read, ReadByID, ReadByEmail, FilterByInterest };
+async function getTodaySession(req, res){
+    try{
+        const alumniID = req.body.alumniID
+        const today = new Date().toISOString().slice(0, 10)
+        const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        res.status(200).json({
+            data: alumniData,
+            message: "Todays session",
+        });
+    }
+    catch (exception) {
+        console.log(exception);
+        res.status(500).json({
+            error: exception,
+            message: "Something went wrong",
+        });
+    }
+}
+
+async function getPastSession(req, res){
+    try{
+        const alumniID = req.body.alumniID
+        const today = new Date().toISOString().slice(0, 10)
+        const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        res.status(200).json({
+            data: alumniData,
+            message: "Todays session",
+        });
+    }
+    catch (exception) {
+        console.log(exception);
+        res.status(500).json({
+            error: exception,
+            message: "Something went wrong",
+        });
+    }
+}
+
+module.exports = { Create, Update, Read, ReadByID, ReadByEmail, FilterByInterest, getTodaySession, getPastSession };
