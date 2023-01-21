@@ -1,4 +1,5 @@
 const Student = require("../models/student");
+const {getImage} = require("./common");
 
 async function Create(req, res) {
     console.log(req.body);
@@ -77,11 +78,18 @@ async function ReadByEmail(req, res) {
     try{
         const studentEmail = res.locals.email
         const data = await Student.findOne({email: studentEmail})
-        data.image = data.image ? getImage(data.image) : null
-        res.status(200).json({
-            data: data,
-            message: "Student fetched successfully",
-        });
+        if(data === null){
+            res.status(404).json({
+                message: "User Not Found"
+            })
+        }
+        else{
+            data.image = data.image ? getImage(data.image) : null
+            res.status(200).json({
+                data: data,
+                message: "Student fetched successfully",
+            });
+        }
     } catch (exception) {
         console.log(exception);
         res.status(500).json({

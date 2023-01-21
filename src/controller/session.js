@@ -45,15 +45,30 @@ async function Create(req, res) {
 
 async function getUpcomingForStudent(req, res){
     try{
-        const studentEmail = res.locals.studentEmail
         const studentID = req.body.studentID
-        const sessionData = await Session.find({student: {$eq: studentID}}).sort({date: 1, from: 1}).populate('alumni');
-        const upcomingSession = sessionData[0]
-        upcomingSession.alumni.image = upcomingSession.alumni.image ? getImage(upcomingSession.alumni.image) : null
-        res.status(200).json({
-            data: upcomingSession,
-            message: "Upcoming session",
-        });
+        const today = new Date().toISOString().slice(0, 10)
+        const currentHour = new Date().getHours();
+        const nextHour = (currentHour+1 < 10 ? "0"+currentHour+1 : currentHour+1).toString() + ":00"
+        const sessionData = await Session.find({student: {$eq: studentID}, date: {$gte: today}}).sort({date: 1, from: 1}).populate('alumni');
+        if(sessionData.length === 0) {
+            res.status(200).json({
+                message: "No Upcoming session",
+            })
+        }
+        else {
+            let upcomingSession = sessionData[0];
+            for(let session of sessionData){
+                if(session['from'] >= nextHour){
+                    upcomingSession = session;
+                    break;
+                }
+            }
+            upcomingSession.alumni.image = upcomingSession.alumni.image ? getImage(upcomingSession.alumni.image) : null
+            res.status(200).json({
+                data: upcomingSession,
+                message: "Upcoming session",
+            });
+        }
     } 
     catch(exception) {
         console.log(exception);
@@ -68,13 +83,29 @@ async function getUpcomingForStudent(req, res){
 async function getUpcomingForAlumni(req, res){
     try{
         const alumniID = req.body.alumniID
-        const sessionData = await Session.find({alumni: {$eq: alumniID}}).sort({date: 1, from: 1}).populate('student');
-        const upcomingSession = sessionData[0]
-        upcomingSession.student.image = upcomingSession.student.image ? getImage(upcomingSession.student.image) : null
-        res.status(200).json({
-            data: upcomingSession,
-            message: "Upcoming session",
-        });
+        const today = new Date().toISOString().slice(0, 10)
+        const currentHour = new Date().getHours();
+        const nextHour = (currentHour+1 < 10 ? "0"+currentHour+1 : currentHour+1).toString() + ":00"
+        const sessionData = await Session.find({alumni: {$eq: alumniID}, date: {$gte: today}}).sort({date: 1, from: 1}).populate('student');
+        if(sessionData.length === 0){
+            res.status(200).json({
+                message: "No Upcoming session",
+            })
+        }
+        else{
+            let upcomingSession = sessionData[0]
+            for(let session of sessionData){
+                if(session['from'] >= nextHour){
+                    upcomingSession = session;
+                    break;
+                }
+            }
+            upcomingSession.student.image = upcomingSession.student.image ? getImage(upcomingSession.student.image) : null
+            res.status(200).json({
+                data: upcomingSession,
+                message: "Upcoming session",
+            });
+        }
     } 
     catch(exception) {
         console.log(exception);

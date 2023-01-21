@@ -87,11 +87,18 @@ async function ReadByEmail(req, res) {
     try{
         const studentEmail = res.locals.email
         const data = await Alumni.findOne({email: studentEmail})
-        data.image = data.image ? getImage(data.image) : null
-        res.status(200).json({
-            data: data,
-            message: "Alumni fetched successfully",
-        });
+        if(data === null){
+            res.status(404).json({
+                message: "User Not Found"
+            })
+        }
+        else{
+            data.image = data.image ? getImage(data.image) : null
+            res.status(200).json({
+                data: data,
+                message: "Alumni fetched successfully",
+            });
+        }
     } catch (exception) {
         console.log(exception);
         res.status(500).json({
@@ -126,8 +133,12 @@ async function getTodaySession(req, res){
     try{
         const today = new Date("2023-01-24").toISOString().slice(0, 10)
         const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        let studentsImageFetched = []
         for(let record of alumniData){
-            record.student.image = record.student.image ? getImage(record.student.image) : null
+            if(!studentsImageFetched.includes(record.student._id)){
+                studentsImageFetched.push(record.student._id)
+                record.student.image = record.student.image ? getImage(record.student.image) : null
+            }
         }
         res.status(200).json({
             data: alumniData,
@@ -145,11 +156,16 @@ async function getTodaySession(req, res){
 
 async function getPastSession(req, res){
     try{
+        const userName = req.body.name
         const alumniID = req.body.alumniID
         const today = new Date("2023-01-24").toISOString().slice(0, 10)
-        const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        const alumniData = await Session.find({participants: userName, alumni: {$eq: req.body.alumniID}}).populate('student')
+        let studentsImageFetched = []
         for(let record of alumniData){
-            record.student.image = record.student.image ? getImage(record.student.image) : null
+            if(!studentsImageFetched.includes(record.student._id)){
+                studentsImageFetched.push(record.student._id)
+                record.student.image = record.student.image ? getImage(record.student.image) : null
+            }
         }
         res.status(200).json({
             data: alumniData,
