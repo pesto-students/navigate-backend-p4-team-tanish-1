@@ -33,29 +33,58 @@ async function dyteCreateMeeting(topic){
 
 async function addParticipant(req, res){
     try{
-        const {name, userID} = req.body
+        const {name, userID, image} = req.body
         const data = await Session.findById(req.body.id);
         const meetingID = data.meetingID;
         data.participants.push(req.body.name)
         data.save()
         
         const URL = `/meetings/${meetingID}/participants`
-        const body = {
-            "name": name,
-            "picture": "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfDJ8MHx8&auto=format&fit=crop&w=500&q=60",
-            "preset_name": "navigate-session",
-            "client_specific_id": userID
-        }
-        const response = await DYTE_CLIENT.post(URL, body, {
+        const response = await DYTE_CLIENT.get(URL, {
             auth: {
                 username: USERNAME,
                 password: PASSWORD
             }
         })
-        res.status(200).json({
-            data: response.data,
-            message: "Participant added"
-        })
+        const participantsData = response.data.data;
+        let refreshParticipant = false;
+        for(const participant of participantsData){
+            if(participant['custom_participant_id'] === userID){
+                const participant_id = participant['id']
+                const URL = `/meetings/${meetingID}/participants/${participant_id}/token`
+                const response = await DYTE_CLIENT.post(URL, {}, {
+                    auth: {
+                        username: USERNAME,
+                        password: PASSWORD
+                    }
+                })
+                refreshParticipant = true
+                res.status(200).json({
+                    data: response.data,
+                    message: "Participant added"
+                })
+                break
+            }
+        }
+        if(!refreshParticipant){
+            const URL = `/meetings/${meetingID}/participants`
+            const body = {
+                "name": name,
+                "picture": image,
+                "preset_name": "navigate-session",
+                "client_specific_id": userID
+            }
+            const response = await DYTE_CLIENT.post(URL, body, {
+                auth: {
+                    username: USERNAME,
+                    password: PASSWORD
+                }
+            })
+            res.status(200).json({
+                data: response.data,
+                message: "Participant added"
+            })
+        }
     }
     catch(exception){
         const error = exception.response.data;

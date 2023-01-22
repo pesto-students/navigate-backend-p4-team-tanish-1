@@ -7,7 +7,10 @@ admin.initializeApp({
 })
 async function verifyToken(req, res, next) {
     try{
-        auth_token = req.headers.authorization.split(' ')[1];
+        if(req.headers.authorization)
+            auth_token = req.headers.authorization.split(' ')[1];
+        else
+            res.status(400).json({message: "Bad Request. Token not found"})
         let resp = await admin.auth().verifyIdToken(auth_token)
         const userEmail = resp.email;
         res.locals.email = userEmail;
