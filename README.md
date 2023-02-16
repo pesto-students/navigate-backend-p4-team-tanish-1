@@ -9,7 +9,7 @@
 
 Navigate is designed to foster meaningful connections and support between students and industry professionals. Whether you're a student looking to build your network, or a professional looking to give back, Navigate provides a platform to make it happen.
 
-## Table of content
+## Table of Contents
 1. [Demo](#demo)
 2. [Installation](#install)
 3. [Tech Stack](#tech)
