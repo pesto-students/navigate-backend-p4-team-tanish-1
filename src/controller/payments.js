@@ -8,14 +8,11 @@ const instance = new Razorpay({
 })
 
 async function createOrder(amount){
-    //Creating order
-    console.log(amount);
     try{
         const order = await instance.orders.create({
             amount: amount*100,
             currency: "INR"
         })
-        console.log(order);
         return order;
     }
     catch(exception){

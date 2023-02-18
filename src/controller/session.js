@@ -2,7 +2,6 @@ const Session = require("../models/session");
 const Alumni = require("../models/alumni");
 const dyteController = require("./meeting");
 const paymentController = require("./payments");
-const session = require("../models/session");
 const { getImage } = require("./common");
 
 async function Create(req, res) {
@@ -13,6 +12,7 @@ async function Create(req, res) {
         const isPaid = amount <= 0
         const data = {...req.body, meetingID: dyteResponse["data"]["id"], paid: isPaid};
         const sessionObj = new Session(data);
+        sessionObj.at = new Date(`${sessionObj.date}T${sessionObj.from}Z`).getTime()
         const savedObj = await sessionObj.save();
         if(amount > 0){
             const order = await paymentController.createOrder(amount);
@@ -46,10 +46,8 @@ async function Create(req, res) {
 async function getUpcomingForStudent(req, res){
     try{
         const studentID = req.body.studentID
-        const today = new Date().toISOString().slice(0, 10)
-        const currentHour = new Date().getHours();
-        const nextHour = (currentHour+1 < 10 ? "0"+currentHour+1 : currentHour+1).toString() + ":00"
-        const sessionData = await Session.find({student: {$eq: studentID}, date: {$gte: today}}).sort({date: 1, from: 1}).populate('alumni');
+        const today = new Date().getTime()
+        const sessionData = await Session.find({student: {$eq: studentID}, at: {$gte: today}}).sort({at: 1}).populate('alumni');
         if(sessionData.length === 0) {
             res.status(200).json({
                 message: "No Upcoming session",
@@ -57,12 +55,6 @@ async function getUpcomingForStudent(req, res){
         }
         else {
             let upcomingSession = sessionData[0];
-            for(let session of sessionData){
-                if(session['from'] >= nextHour){
-                    upcomingSession = session;
-                    break;
-                }
-            }
             upcomingSession.alumni.image = upcomingSession.alumni.image ? getImage(upcomingSession.alumni.image) : null
             res.status(200).json({
                 data: upcomingSession,
@@ -83,10 +75,8 @@ async function getUpcomingForStudent(req, res){
 async function getUpcomingForAlumni(req, res){
     try{
         const alumniID = req.body.alumniID
-        const today = new Date().toISOString().slice(0, 10)
-        const currentHour = new Date().getHours();
-        const nextHour = (currentHour+1 < 10 ? "0"+currentHour+1 : currentHour+1).toString() + ":00"
-        const sessionData = await Session.find({alumni: {$eq: alumniID}, date: {$gte: today}}).sort({date: 1, from: 1}).populate('student');
+        const today = new Date().getTime()
+        const sessionData = await Session.find({alumni: {$eq: alumniID}, at: {$gte: today}}).sort({at: 1}).populate('student');
         if(sessionData.length === 0){
             res.status(200).json({
                 message: "No Upcoming session",
@@ -94,12 +84,6 @@ async function getUpcomingForAlumni(req, res){
         }
         else{
             let upcomingSession = sessionData[0]
-            for(let session of sessionData){
-                if(session['from'] >= nextHour){
-                    upcomingSession = session;
-                    break;
-                }
-            }
             upcomingSession.student.image = upcomingSession.student.image ? getImage(upcomingSession.student.image) : null
             res.status(200).json({
                 data: upcomingSession,
@@ -153,7 +137,7 @@ async function getAvailableSlots(req, res) {
                 fromOptions.push(startTime < 10 ? "0" + startTime.toString() + ":00" : startTime.toString() + ":00");
                 startTime++;
             }
-            const meetingData = await session.find({date: {$eq: dateString}, alumni: {$eq: req.body.alumniID}}).sort({from: 1})
+            const meetingData = await Session.find({date: {$eq: dateString}, alumni: {$eq: req.body.alumniID}}).sort({from: 1})
             
             for(const meeting of meetingData){
                 startsFrom = meeting['from'];

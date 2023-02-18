@@ -21,7 +21,6 @@ async function uploadFile(req, res){
     if(userData === null){
         userData = await alumni.findById(userID);
     }
-    console.log(userData);
     if (req.file == null) {
         return res.status(400).json({ 'message': 'Please choose the file' })
     }
@@ -38,7 +37,6 @@ async function uploadFile(req, res){
                 throw err
             }
             processUploadedData(res, data, userData);
-            console.log(`Image uploaded successfully ${data.Location}`);
         });
     }
     uploadToS3(file);

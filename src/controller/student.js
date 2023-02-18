@@ -2,7 +2,6 @@ const Student = require("../models/student");
 const {getImage} = require("./common");
 
 async function Create(req, res) {
-    console.log(req.body);
     try {
         const studentObj = new Student(req.body);
         const savedObj = await studentObj.save();
