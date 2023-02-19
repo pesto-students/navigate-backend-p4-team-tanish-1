@@ -131,8 +131,10 @@ async function FilterByInterest(req, res){
 
 async function getTodaySession(req, res){
     try{
-        const today = new Date("2023-01-24").toISOString().slice(0, 10)
-        const alumniData = await Session.find({date: {$eq: today}, alumni: {$eq: req.body.alumniID}}).populate('student')
+        const today = new Date().toISOString().split('T')[0]
+        const todayTimeStamp = new Date(today).getTime()
+        const tomorrowTimeStamp = todayTimeStamp + 86400000
+        const alumniData = await Session.find({at: {$gte: todayTimeStamp, $lte: tomorrowTimeStamp}, alumni: {$eq: req.body.alumniID}}).populate('student')
         let studentsImageFetched = []
         for(let record of alumniData){
             if(!studentsImageFetched.includes(record.student._id)){
@@ -156,10 +158,8 @@ async function getTodaySession(req, res){
 
 async function getPastSession(req, res){
     try{
-        const userName = req.body.name
-        const alumniID = req.body.alumniID
-        const today = new Date("2023-01-24").toISOString().slice(0, 10)
-        const alumniData = await Session.find({participants: userName, alumni: {$eq: req.body.alumniID}}).populate('student')
+        const todayTimeStamp = new Date().getTime()
+        const alumniData = await Session.find({at: {$lte: todayTimeStamp}, alumni: {$eq: req.body.alumniID}}).populate('student').sort({at: 1})
         let studentsImageFetched = []
         for(let record of alumniData){
             if(!studentsImageFetched.includes(record.student._id)){

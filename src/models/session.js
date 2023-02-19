@@ -57,6 +57,10 @@ const sessionSchema = new Schema({
     participants: {
         required: false,
         type: Array
+    },
+    at: {
+        required: false,
+        type: Number
     }
 },{
     timestamps: true
