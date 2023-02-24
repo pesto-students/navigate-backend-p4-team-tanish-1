@@ -1,7 +1,9 @@
+// Import schema
 const Alumni = require("../models/alumni");
 const Session = require("../models/session");
 const { getImage } = require("./common");
 
+// Create Alumni
 async function Create(req, res) {
     try {
         const alumniObj = new Alumni(req.body);
@@ -19,7 +21,9 @@ async function Create(req, res) {
     }
 }
 
+// Update Alumni
 async function Update(req, res) {
+    // availability of alumni
     const availability = {
         weekdaysFrom: req.body.weekdaysFrom,
         weekdaysTo: req.body.weekdaysTo,
@@ -44,11 +48,13 @@ async function Update(req, res) {
     }
 }
 
+// Search alumni
 async function Read(req, res) {
     const queryString = req.query.q
     const regExp = new RegExp(queryString, 'i')
     try {
         const data = await Alumni.find({name: {$regex: regExp}});
+        // if image is not set assign null
         for(let record of data){
             record.image = record.image ? getImage(record.image) : null
         }
@@ -65,10 +71,13 @@ async function Read(req, res) {
     }
 }
 
+// Get alumni by ID
 async function ReadByID(req, res) {
     try {
         const alumni_id = req.params.id
         const data = await Alumni.findById(alumni_id);
+        
+        // if image is not set assign null
         data.image = data.image ? getImage(data.image) : null
         res.status(200).json({
             data: data,
@@ -83,6 +92,7 @@ async function ReadByID(req, res) {
     }
 }
 
+// Get alumni by email
 async function ReadByEmail(req, res) {
     try{
         const studentEmail = res.locals.email
@@ -108,6 +118,7 @@ async function ReadByEmail(req, res) {
     }
 }
 
+// Filter alumni by interest
 async function FilterByInterest(req, res){
     const interest = req.body.interest;
     try{
@@ -129,13 +140,20 @@ async function FilterByInterest(req, res){
     }
 }
 
+// Get list of sessions scheduled today
 async function getTodaySession(req, res){
     try{
+        // today's date in DD-MM-YYYY format
         const today = new Date().toISOString().split('T')[0]
+        
+        // get timestamp
         const todayTimeStamp = new Date(today).getTime()
         const tomorrowTimeStamp = todayTimeStamp + 86400000
+        
+        // filter sessions
         const alumniData = await Session.find({at: {$gte: todayTimeStamp, $lte: tomorrowTimeStamp}, alumni: {$eq: req.body.alumniID}}).populate('student')
         let studentsImageFetched = []
+        // get presigned URL for images in S3
         for(let record of alumniData){
             if(!studentsImageFetched.includes(record.student._id)){
                 studentsImageFetched.push(record.student._id)
@@ -156,11 +174,14 @@ async function getTodaySession(req, res){
     }
 }
 
+// Fetch past sessions
 async function getPastSession(req, res){
     try{
+        // filter sessions with less than current timestamp
         const todayTimeStamp = new Date().getTime()
         const alumniData = await Session.find({at: {$lte: todayTimeStamp}, alumni: {$eq: req.body.alumniID}}).populate('student').sort({at: 1})
         let studentsImageFetched = []
+        // get presigned url for all records
         for(let record of alumniData){
             if(!studentsImageFetched.includes(record.student._id)){
                 studentsImageFetched.push(record.student._id)

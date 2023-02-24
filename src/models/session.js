@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
+// session schema
 const sessionSchema = new Schema({
     topic: {
         required: true,
@@ -63,7 +64,7 @@ const sessionSchema = new Schema({
         type: Number
     }
 },{
-    timestamps: true
+    timestamps: true // add timestamp for createdAt and updatedAt automatically
 })
 
 module.exports = mongoose.model('Sessions', sessionSchema)

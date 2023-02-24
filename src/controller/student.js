@@ -1,6 +1,8 @@
+// import modules
 const Student = require("../models/student");
 const {getImage} = require("./common");
 
+// Create student
 async function Create(req, res) {
     try {
         const studentObj = new Student(req.body);
@@ -22,6 +24,8 @@ async function Create(req, res) {
     }
 }
 
+
+// Update student
 async function Update(req, res) {
     try {
         let student_id = req.params.id;
@@ -39,6 +43,7 @@ async function Update(req, res) {
     }
 }
 
+// Get student
 async function Read(req, res) {
     try {
         const data = await Student.find();
@@ -55,6 +60,7 @@ async function Read(req, res) {
     }
 }
 
+// read student by ID
 async function ReadByID(req, res) {
     try {
         const student_id = req.params.id
@@ -73,6 +79,7 @@ async function ReadByID(req, res) {
     }
 }
 
+// get student by email
 async function ReadByEmail(req, res) {
     try{
         const studentEmail = res.locals.email

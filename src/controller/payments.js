@@ -1,12 +1,15 @@
+// import modules
 const Razorpay = require("razorpay")
 const crypto = require("crypto");
 const session = require("../models/session");
 
+// razorpay secrets and razorpay client
 const instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY,
     key_secret: process.env.RAZORPAY_SECRET
 })
 
+// create order on razorpay
 async function createOrder(amount){
     try{
         const order = await instance.orders.create({
@@ -20,20 +23,27 @@ async function createOrder(amount){
     }
 }
 
+// verify payment signature and add payment details to database
 async function verifyPayment(req, res) {
     const {order_id, payment_id, razorpay_signature, sessionID} = req.body;
     try{
+        // generate signature from orderID and paymentID
         const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET);
         hmac.update(order_id + "|" + payment_id);
         let expectedSignature = hmac.digest('hex');
         const isVerified = razorpay_signature === expectedSignature;
+
+        // if generated signature and signature in request match then data is valid
         if(isVerified){
             await session.findOneAndUpdate({_id: sessionID}, {paymentID: payment_id, paymentSignature: razorpay_signature, paid: true});
+            res.status(200).json({
+                isVerified,
+                message: "Signature verified"
+            })
         }
-        res.status(200).json({
-            isVerified,
-            message: "Signature verified"
-        })
+        else{
+            throw Error("Signature verification failed");
+        }
     } 
     catch(exception) {
         let message = "Something went wrong"

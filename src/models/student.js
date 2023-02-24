@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// student schema
 const studentSchema = new mongoose.Schema({
     firebaseID: {
         unique: true,
@@ -52,7 +53,7 @@ const studentSchema = new mongoose.Schema({
         type: String
     }
 },{
-    timestamps: true
+    timestamps: true // add timestamp for createdAt and updatedAt automatically
 })
 
 module.exports = mongoose.model('Student', studentSchema)

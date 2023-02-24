@@ -1,8 +1,10 @@
+// import modules
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const alumni = require('../models/alumni');
 const student = require('../models/student');
 
+// S3 secrets
 const bucketName = process.env.AWS_BUCKET_NAME
 const region = process.env.AWS_BUCKET_REGION
 const accessKeyId = process.env.AWS_ACCESS_KEY
@@ -15,6 +17,7 @@ const s3 = new AWS.S3({
 });
 
 async function uploadFile(req, res){
+    // fetch user data
     const userID = req.body.userID;
     let userData;
     userData = await student.findById(userID);
@@ -24,6 +27,7 @@ async function uploadFile(req, res){
     if (req.file == null) {
         return res.status(400).json({ 'message': 'Please choose the file' })
     }
+    // uploading image to S3
     var file = req.file
     const uploadToS3 = (file) => {
         const fileStream = fs.createReadStream(file.path);
@@ -36,12 +40,14 @@ async function uploadFile(req, res){
             if (err) {
                 throw err
             }
+            // save image data in database
             processUploadedData(res, data, userData);
         });
     }
     uploadToS3(file);
 }
 
+// save image key in database for that user
 async function processUploadedData (res, data, userData){
     const url = getImage(data['Key']);
     userData.image = data['Key']
@@ -51,6 +57,8 @@ async function processUploadedData (res, data, userData){
         imageSrc: url
     })
 }
+
+// get presigned url from key
 function getImage(key){
     if(key === undefined){
         return undefined

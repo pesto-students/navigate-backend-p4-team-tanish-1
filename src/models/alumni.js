@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Alumni schema
 const alumniSchema = new mongoose.Schema({
     firebaseID: {
         unique: true,
@@ -72,7 +73,7 @@ const alumniSchema = new mongoose.Schema({
         type: Number
     }
 },{
-    timestamps: true
+    timestamps: true // add timestamp for createdAt and updatedAt automatically
 })
 
 module.exports = mongoose.model('Alumni', alumniSchema)

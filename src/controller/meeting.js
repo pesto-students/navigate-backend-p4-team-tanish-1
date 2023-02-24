@@ -1,15 +1,18 @@
+// import required modules
 const axios = require("axios");
-const session = require("../models/session");
 const Session = require("../models/session")
 
+// dyte secrets
 const DYTE_HOST = "https://api.cluster.dyte.in/v2"
 const USERNAME = process.env.DYTE_ORGANIZATION_ID
 const PASSWORD = process.env.DYTE_API_KEY
 
+// create dyte client
 const DYTE_CLIENT = axios.create({
     baseURL: DYTE_HOST
 })
 
+// create meeting using REST API
 async function dyteCreateMeeting(topic){
     const body = {
         "title": topic,
@@ -31,6 +34,7 @@ async function dyteCreateMeeting(topic){
     }
 }
 
+// Add participant to meeting and return token to participant
 async function addParticipant(req, res){
     try{
         const {name, userID, image} = req.body
@@ -39,6 +43,7 @@ async function addParticipant(req, res){
         data.participants.push(req.body.name)
         data.save()
         
+        // First check if participant already exist in meeting
         const URL = `/meetings/${meetingID}/participants`
         const response = await DYTE_CLIENT.get(URL, {
             auth: {
@@ -47,9 +52,11 @@ async function addParticipant(req, res){
             }
         })
         const participantsData = response.data.data;
+        
         let refreshParticipant = false;
         for(const participant of participantsData){
             if(participant['custom_participant_id'] === userID){
+                // participant already exists in meeting then refresh user's token
                 const participant_id = participant['id']
                 const URL = `/meetings/${meetingID}/participants/${participant_id}/token`
                 const response = await DYTE_CLIENT.post(URL, {}, {
@@ -66,6 +73,8 @@ async function addParticipant(req, res){
                 break
             }
         }
+
+        // If participant not already present in meeting add participant
         if(!refreshParticipant){
             const URL = `/meetings/${meetingID}/participants`
             const body = {
